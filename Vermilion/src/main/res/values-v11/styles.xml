@@ -1,5 +1,11 @@
 <resources>
-    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+    <style name="Custom" parent="Theme.AppCompat.Light">
         <item name="android:actionBarTabStyle">@style/Custom.ActionBar.TabView.Empty</item>
+        <item name="android:actionBarStyle">@style/Custom.ActionBar.Empty</item>
+        <item name="android:windowContentOverlay">@null</item>
+    </style>
+
+    <style name="Custom.ActionBar.Empty" parent="@android:style/Widget.Holo.ActionBar">
+        <item name="android:background">@android:color/transparent</item>
     </style>
 </resources>

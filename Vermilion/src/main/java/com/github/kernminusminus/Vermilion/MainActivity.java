@@ -79,9 +79,15 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
             // the TabListener interface, as the callback (listener) for when
             // this tab is selected.
 
+            ColorModel.Colors curColor = ColorModel.Colors.get(i);
+
             View custom = inflater.inflate(R.layout.tab_background, null);
+
             SimpleColorListenerView colorView = (SimpleColorListenerView)custom.findViewById(R.id.tab_highlight);
-            colorView.listenForColorChange(ColorModel.Colors.get(i).name);
+            colorView.listenForColorChange(curColor.name);
+
+            TextView titleView = (TextView)custom.findViewById(R.id.tab_title);
+            titleView.setText(String.valueOf(curColor.name.charAt(0)));
 
             actionBar.addTab(
                     actionBar.newTab()
