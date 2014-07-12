@@ -2,6 +2,8 @@ package com.github.kernminusminus.Vermilion;
 
 import java.util.Locale;
 
+import android.graphics.drawable.ColorDrawable;
+import android.provider.CalendarContract;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBar;
 import android.support.v4.app.Fragment;
@@ -21,6 +23,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.github.kernminusminus.Vermilion.model.ColorModel;
+import com.github.kernminusminus.Vermilion.view.SimpleColorListenerView;
 import com.larswerkman.holocolorpicker.ColorPicker;
 
 public class MainActivity extends ActionBarActivity implements ActionBar.TabListener {
@@ -39,30 +43,6 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
      * The {@link ViewPager} that will host the section contents.
      */
     ViewPager mViewPager;
-
-    enum Colors {
-
-        RED ("Red"),
-        ORANGE ("Orange"),
-        YELLOW ("Yellow"),
-        GREEN ("Green"),
-        BLUE ("Blue"),
-        VIOLET ("Violet");
-
-        public final String name;
-        private Colors(String name) {this.name = name;}
-        public static Colors get(int i) {
-            switch (i){
-                case 0: return RED;
-                case 1: return ORANGE;
-                case 2: return YELLOW;
-                case 3: return GREEN;
-                case 4: return BLUE;
-                case 5: return VIOLET;
-            }
-            return RED;
-        }
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,15 +72,23 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
         });
 
         // For each of the sections in the app, add a tab to the action bar.
+        LayoutInflater inflater = getLayoutInflater();
         for (int i = 0; i < mSectionsPagerAdapter.getCount(); i++) {
             // Create a tab with text corresponding to the page title defined by
             // the adapter. Also specify this Activity object, which implements
             // the TabListener interface, as the callback (listener) for when
             // this tab is selected.
+
+            View custom = inflater.inflate(R.layout.tab_background, null);
+            SimpleColorListenerView colorView = (SimpleColorListenerView)custom.findViewById(R.id.tab_highlight);
+            colorView.listenForColorChange(ColorModel.Colors.get(i).name);
+
             actionBar.addTab(
                     actionBar.newTab()
+                            .setCustomView(custom)
                             .setText(mSectionsPagerAdapter.getPageTitle(i))
-                            .setTabListener(this));
+                            .setTabListener(this)
+            );
         }
     }
 
@@ -130,10 +118,13 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
         // When the given tab is selected, switch to the corresponding page in
         // the ViewPager.
         mViewPager.setCurrentItem(tab.getPosition());
+
+        tab.getCustomView().findViewById(R.id.tab_highlight).setVisibility(View.VISIBLE);
     }
 
     @Override
     public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
+        tab.getCustomView().findViewById(R.id.tab_highlight).setVisibility(View.GONE);
     }
 
     @Override
@@ -154,7 +145,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
         public Fragment getItem(int position) {
             // getItem is called to instantiate the fragment for the given page.
             // Return a PlaceholderFragment (defined as a static inner class below).
-            return PlaceholderFragment.newInstance(Colors.get(position).name);
+            return PlaceholderFragment.newInstance(ColorModel.Colors.get(position).name, ColorModel.Colors.get(position).index);
         }
 
         @Override
@@ -165,7 +156,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
         @Override
         public CharSequence getPageTitle(int position) {
             Locale l = Locale.getDefault();
-            return Colors.get(position).name;
+            return ColorModel.Colors.get(position).name;
         }
     }
 
@@ -179,11 +170,15 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
          */
         private static final String ARG_SECTION_COLOR = "color";
 
+        private final ColorModel mModel;
+        private String mColor;
+
+
         /**
          * Returns a new instance of this fragment for the given section
          * number.
          */
-        public static PlaceholderFragment newInstance(String color) {
+        public static PlaceholderFragment newInstance(String color, int index) {
             PlaceholderFragment fragment = new PlaceholderFragment();
             Bundle args = new Bundle();
             args.putString(ARG_SECTION_COLOR, color);
@@ -192,6 +187,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
         }
 
         public PlaceholderFragment() {
+            mModel = ColorModel.getInstance();
         }
 
         @Override
@@ -203,8 +199,9 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
             picker.setShowOldCenterColor(false);
             picker.setOnColorChangedListener(this);
 
+            mColor = getArguments().getString(ARG_SECTION_COLOR);
             TextView prompt = (TextView)rootView.findViewById(R.id.prompt);
-            prompt.setText(getString(R.string.prompt_choose_base_color) + " " + getArguments().getString(ARG_SECTION_COLOR).toLowerCase());
+            prompt.setText(getString(R.string.prompt_choose_base_color) + " " + mColor.toLowerCase());
 
             return rootView;
         }
@@ -219,6 +216,8 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
             coloredText.setSpan(new ForegroundColorSpan(color), getString(R.string.prompt_choose_base_color).length() + 1, oldText.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
 
             prompt.setText(coloredText);
+
+            mModel.setBaseColor(mColor, color);
         }
     }
 

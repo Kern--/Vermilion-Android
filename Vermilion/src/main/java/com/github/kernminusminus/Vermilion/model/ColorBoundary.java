@@ -1,4 +1,4 @@
-package com.github.kernminusminus.Vermilion;
+package com.github.kernminusminus.Vermilion.model;
 
 import android.graphics.Color;
 

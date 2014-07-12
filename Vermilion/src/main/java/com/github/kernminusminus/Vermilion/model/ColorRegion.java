@@ -1,23 +1,21 @@
-package com.github.kernminusminus.Vermilion;
+package com.github.kernminusminus.Vermilion.model;
 
 import android.graphics.Color;
 
 public class ColorRegion {
-    private String mName;
     private int mBaseColor;
     private ColorBoundary mUpperBound;
     private ColorBoundary mLowerBound;
 
 
-    public ColorRegion(String name, int baseColor, ColorBoundary upperBound, ColorBoundary lowerBound) {
-        mName = name;
+    public ColorRegion(int baseColor, ColorBoundary upperBound, ColorBoundary lowerBound) {
         mBaseColor = baseColor;
         mUpperBound = upperBound;
         mLowerBound = lowerBound;
     }
 
-    public String getName(){
-        return mName;
+    public void setBaseColor(int baseColor) {
+        mBaseColor = baseColor;
     }
 
     public int getBaseColor() {
